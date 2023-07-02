@@ -20,6 +20,27 @@ CITIES = {
     "TORONTO": "https://code.s3.yandex.net/async-module/toronto-response.json"
 }
 
+CITIES_TRANSLATION = {
+    "MOSCOW": "Москва",
+    "PARIS": "Париж",
+    "LONDON": "Лондон",
+    "BERLIN": "Берлин",
+    "BEIJING": "Пекин",
+    "KAZAN": "Казань",
+    "SPETERSBURG": "Санкт-Петербург",
+    "VOLGOGRAD": "Волгоград",
+    "NOVOSIBIRSK": "Новосибирск",
+    "KALININGRAD": "Калининград",
+    "ABUDHABI": "Абу-Даби",
+    "WARSZAWA": "Варшава",
+    "BUCHAREST": "Бухарест",
+    "ROMA": "Рим",
+    "CAIRO": "Каир",
+    "GIZA": "Гиза",
+    "MADRID": "Мадрид",
+    "TORONTO": "Торонто"
+}
+
 MIN_MAJOR_PYTHON_VER = 3
 MIN_MINOR_PYTHON_VER = 9
 
@@ -28,8 +49,8 @@ def check_python_version():
     import sys
 
     if (
-        sys.version_info.major < MIN_MAJOR_PYTHON_VER
-        or sys.version_info.minor < MIN_MINOR_PYTHON_VER
+            sys.version_info.major < MIN_MAJOR_PYTHON_VER
+            or sys.version_info.minor < MIN_MINOR_PYTHON_VER
     ):
         raise Exception(
             "Please use python version >= {}.{}".format(
