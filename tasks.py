@@ -28,6 +28,13 @@ class DataFetchingTask:
         self._city_names = city_names
         self._queue = Queue()
         self._data_dir = data_dir
+        try:
+            if not os.path.exists(self._data_dir):
+                logging.info(f'Cant find directory {self._data_dir}')
+                os.makedirs(self._data_dir)
+                logging.info(f'Created directory {self._data_dir}')
+        except OSError as err:
+            logging.error(f'Cant create directory {self._data_dir}: \n{err}')
 
     def _get_city_data(self, city_name: str) -> dict:
         """
