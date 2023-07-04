@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import subprocess
@@ -7,7 +8,7 @@ from queue import Queue
 
 import xlsxwriter
 
-from external.client import YandexWeatherAPI
+from external.client import YandexWeatherAPI, YandexWeatherAPIError
 from utils import get_url_by_city_name, CITIES, CITIES_TRANSLATION
 
 logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ class DataFetchingTask:
                 response['status'] = 'No info'
                 logger.error(f'Failed {city_name}: \n{response["status"]}')
 
-        except Exception as err:
+        except YandexWeatherAPIError as err:
             logger.error(f'Failed {city_name}: \n{err}')
             response['status'] = str(err)
             response['city_name'] = city_name
@@ -114,7 +115,7 @@ class DataCalculationTask:
             else:
                 logger.debug(f'{city_name} data has been calculated and saved into {output_filename}')
 
-        except Exception as err:
+        except subprocess.CalledProcessError as err:
             logger.error(f'Failed {city_name}: \n{err}')
             calc_result['status'] = str(err)
         return calc_result
@@ -173,7 +174,7 @@ class DataAggregationTask:
                 data = json.load(json_file)
                 agg_city_data['data'] = data
                 agg_city_data['status'] = 'OK'
-        except Exception as err:
+        except (FileNotFoundError, json.JSONDecodeError) as err:
             logger.error(f'Failed {city_name}: \n{err}')
             agg_city_data['status'] = str(err)
         agg_city_data['city_name'] = city_name
@@ -252,7 +253,7 @@ class DataAnalyzingTask:
         logger.info(f'Average condition hours: {best_city["agg_temp_avg"]}')
         try:
             self._generate_output_report(agg_cities_data, sorted_cities)
-        except Exception as err:
+        except xlsxwriter.exceptions.XlsxWriterException as err:
             logger.error(f'Cant generate output report: \n{err}')
         return best_cities
 
