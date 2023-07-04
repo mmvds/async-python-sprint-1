@@ -4,7 +4,6 @@ import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multiprocessing import Pool
 from queue import Queue
-from typing import List, Any
 
 import xlsxwriter
 
@@ -223,9 +222,12 @@ class DataAnalyzingTask:
             agg_cities_data[city['city_name']]['rank'] = city['rank']
         return agg_cities_data
 
-    def _find_best_city(self, agg_cities_data):
+    def _find_best_city(self, agg_cities_data: dict) -> list:
         sorted_cities_data = sorted(agg_cities_data.items(), key=lambda x: x[1].get('rank', len(agg_cities_data)))
         sorted_cities = [city for city, data in sorted_cities_data]
+        if not sorted_cities:
+            logging.info('Got empty list, nothing to analyze')
+            return []
         best_cities = [sorted_cities[0]]
         best_city = agg_cities_data[sorted_cities[0]]['data']
         logger.info('The best city to live is:')
@@ -246,7 +248,8 @@ class DataAnalyzingTask:
         except Exception as err:
             logger.error(f'Cant generate output report: \n{err}')
         return best_cities
-    def _generate_output_report(self, agg_cities_data, sorted_cities):
+
+    def _generate_output_report(self, agg_cities_data: dict, sorted_cities: list) -> None:
         logger.info('Generating output report')
         workbook = xlsxwriter.Workbook(self.report_filename)
         sheet = workbook.add_worksheet()
@@ -275,7 +278,7 @@ class DataAnalyzingTask:
         workbook.close()
         logger.info(f'Report was generated and saved to {self.report_filename}')
 
-    def run(self) -> list[Any]:
+    def run(self) -> list:
         logger.info('Data analyzing started.')
         ranked_cities = self._rank_cities(self.agg_cities_data)
         results = self._find_best_city(ranked_cities)
